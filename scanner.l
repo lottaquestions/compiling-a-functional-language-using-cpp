@@ -2,42 +2,33 @@
 
 %{
 #include <iostream>
-/*
-How to compile:
-flex -o scanner.cpp scanner.l
-g++ -o scanner scanner.cpp
+#include "ast.hpp"
+#include "parser.hpp"
 
-Usage:
-
-echo "3+2*6" | ./scanner
-*/
-
+#define YY_DECL yy::parser::symbol_type yylex()
 %}
 
 %%
 
 [ \n]+ {}
-\+ { std::cout << "PLUS" << std::endl; }
-\* { std::cout << "TIMES" << std::endl; }
--  { std::cout << "MINUS" << std::endl; }
-\/ { std::cout << "DIVIDE" << std::endl; }
-[0-9]+ { std::cout << "NUMBER: " << yytext << std::endl; }
-defn   { std::cout << "KEYWORD: defn" << std::endl; }
-data   { std::cout << "KEYWORD: data" << std::endl; }
-case   { std::cout << "KEYWORD: case" << std::endl; }
-of     { std::cout << "KEYWORD: of" << std::endl; }
-\{   { std::cout << "OPEN CURLY" << std::endl; }
-\}   { std::cout << "CLOSED CURLY" << std::endl; }
-\(   { std::cout << "OPEN PAREN" << std::endl; }
-\)   { std::cout << "CLOSED PAREN" << std::endl; }
-,    { std::cout << "COMMA" << std::endl; }
-->   { std::cout << "PATTERN ARROW" << std::endl; }
-=    { std::cout << "EQUAL" << std::endl; }
-[a-z][a-zA-Z]*   { std::cout << "LOWER CASE IDENTIFIER: " << yytext << std::endl; }
-[A-Z][a-zA-Z]*   { std::cout << "UPPER CASE IDENTIFIER: " << yytext << std::endl; }
+\+ { return yy::parser::make_PLUS(); }
+\* { return yy::parser::make_TIMES(); }
+-  { return yy::parser::make_MINUS(); }
+\/ { return yy::parser::make_DIVIDE(); }
+[0-9]+ { return yy::parser::make_INT(atoi(yytext)); }
+defn { return yy::parser::make_DEFN(); }
+data { return yy::parser::make_DATA(); }
+case { return yy::parser::make_CASE(); }
+of { return yy::parser::make_OF(); }
+\{ { return yy::parser::make_OCURLY(); }
+\} { return yy::parser::make_CCURLY(); }
+\( { return yy::parser::make_OPAREN(); }
+\) { return yy::parser::make_CPAREN(); }
+,  { return yy::parser::make_COMMA(); }
+-> { return yy::parser::make_ARROW(); }
+=  { return yy::parser::make_EQUAL(); }
+[a-z][a-zA-Z]* { return yy::parser::make_LID(std::string(yytext)); }
+[A-Z][a-zA-Z]* { return yy::parser::make_UID(std::string(yytext)); }
 
 %%
 
-int main(){
-  yylex();
-}
