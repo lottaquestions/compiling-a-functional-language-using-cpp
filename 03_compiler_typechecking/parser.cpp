@@ -810,7 +810,7 @@ namespace yy {
 
   case 8:
 #line 80 "parser.y"
-             { std::vector<std::string>(); }
+             { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); }
 #line 815 "parser.cpp"
     break;
 
@@ -918,7 +918,7 @@ namespace yy {
 
   case 26:
 #line 119 "parser.y"
-                      { yylhs.value.as < std::vector<branch_ptr> > () = std::move(yystack_[1].value.as < std::vector<branch_ptr> > ()); yylhs.value.as < std::vector<branch_ptr> > ().push_back(std::move(yystack_[0].value.as < branch_ptr > ())); }
+                      { yylhs.value.as < std::vector<branch_ptr> > () = std::move(yystack_[1].value.as < std::vector<branch_ptr> > ()); yystack_[1].value.as < std::vector<branch_ptr> > ().push_back(std::move(yystack_[0].value.as < branch_ptr > ())); }
 #line 923 "parser.cpp"
     break;
 
