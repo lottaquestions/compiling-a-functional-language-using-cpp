@@ -1,7 +1,7 @@
 #include "type.hpp"
 #include <sstream>
 #include <algorithm>
-
+#include "error.hpp"
 
 void type_var::print(const type_mgr& mgr, std::ostream& to) const {
   auto it = mgr.types.find(name);
@@ -87,7 +87,7 @@ void type_mgr::unify(type_ptr l, type_ptr r){
       return;
     }
   }
-  throw 0;
+  throw unification_error(l,r);
 }
 
 void type_mgr::bind(const std::string& s, type_ptr t){

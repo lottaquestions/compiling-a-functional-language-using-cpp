@@ -34,9 +34,9 @@ void definition_data::typecheck_first(type_mgr& mgr, type_env& env){
   for(auto& constructor : constructors){
     type_ptr full_type = return_type;
 
-    for(auto& type_name : constructor->types){
-      type_ptr type = type_ptr(new type_base(type_name));
-      full_type =  type_ptr(new type_arr(type, full_type));
+    for(auto it = constructor->types.rbegin(); it != constructor->types.rend() ; it++){
+      type_ptr type = type_ptr(new type_base(*it));
+      full_type = type_ptr(new type_arr(type, full_type));
     }
 
     env.bind(constructor->name, full_type);

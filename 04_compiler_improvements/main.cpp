@@ -1,5 +1,6 @@
 #include "ast.hpp"
 #include "parser.hpp"
+#include "error.hpp"
 #include "type.hpp"
 
 void yy::parser::error(const std::string& msg){
@@ -8,9 +9,7 @@ void yy::parser::error(const std::string& msg){
 
 extern std::vector<definition_ptr> program;
 
-void typecheck_program(const std::vector<definition_ptr>& prog){
-  type_mgr mgr;
-  type_env env;
+void typecheck_program(const std::vector<definition_ptr>& prog, type_mgr& mgr, type_env& env){
 
   type_ptr int_type = type_ptr(new type_base("Int"));
   type_ptr binop_type = type_ptr(new type_arr(int_type, type_ptr(new type_arr(int_type, int_type))));
@@ -36,7 +35,10 @@ void typecheck_program(const std::vector<definition_ptr>& prog){
 }
 
 int main (){
+  type_mgr mgr;
+  type_env env;
   yy::parser parser;
+
   parser.parse();
   for(auto& definition : program){
     definition_defn* def = dynamic_cast<definition_defn*>(definition.get());
@@ -48,7 +50,20 @@ int main (){
 
     def->body->print(1, std::cout);
   }
-  typecheck_program(program);
+  try{
+    typecheck_program(program, mgr, env);
+  } catch(unification_error& err){
+    std::cout << "failed to unify types: " << std::endl;
+    std::cout << " (1) \033[34m";
+    err.left->print(mgr, std::cout);
+    std::cout << " \033[0m" << std::endl;
+    std::cout << " (2) \033[32m";
+    err.right->print(mgr, std::cout);
+    std::cout << "\033[0m" << std::endl;
+  } catch (type_error& err){
+    std::cout << "failed to typecheck program: " << err.description << std::endl;
+  }
+  
   std::cout << program.size() << std::endl;
   return 0;
 }

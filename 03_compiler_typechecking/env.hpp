@@ -7,7 +7,7 @@ struct type_env{
   type_env const* parent = nullptr;
 
   type_env(type_env const* p) : parent(p){}
-  type_env() : parent(nullptr){}
+  type_env() : type_env(nullptr){}
 
   type_ptr lookup(const std::string& name) const;
   void bind(const std::string& name, type_ptr t);
