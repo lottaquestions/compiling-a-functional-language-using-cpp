@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "type.hpp"
+#include "langtypes.hpp"
 
 struct type_env{
   std::map<std::string, type_ptr> names;

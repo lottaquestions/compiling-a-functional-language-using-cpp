@@ -5,20 +5,28 @@
   #include "parser.hpp"
 
   std::vector<definition_ptr> program;
-  extern yy::parser::symbol_type yylex();
+
+  extern yy::parser::symbol_type yylex(); // Declares the yylex() function, which is the lexer function responsible for tokenizing input.
+  // It returns a yy::parser::symbol_type object, which represents a token (with optional associated data, such as a value or type).
+  
   /*
-  Next, we must recognize that Bison was originally made for C, rather than C++. In order to allow the parser to store and operate on semantic values of various types, the canonical solution back in those times was to use a C union. Unions are great, but for C++, they’re more trouble than they’re worth: unions don’t allow for non-trivial constructors! This means that stuff like std::unique_ptr and std::string is off limits as a semantic value. But we’d really much rather use them! The solution is to:
+  Next, we must recognize that Bison was originally made for C, rather than C++. In order to allow the parser to store and operate on 
+  semantic values of various types, the canonical solution back in those times was to use a C union. Unions are great, but for C++, 
+  they’re more trouble than they’re worth: unions don’t allow for non-trivial constructors! This means that stuff like std::unique_ptr 
+  and std::string is off limits as a semantic value. But we’d really much rather use them! The solution is to:
    
       1. Specify the language to be C++, rather than C.
       2. Enable the variant API feature, which uses a lightweight std::variant alternative in place of a union.
       3. Enable the creation of token constructors, which we will use in Flex.
    
-  In order to be able to use the variant-based API, we also need to change the Flex yylex function to return yy::parser::symbol_type. You can see it in our forward declaration of yylex in scanner.l
+  In order to be able to use the variant-based API, we also need to change the Flex yylex function to return yy::parser::symbol_type. You can 
+  see it in our forward declaration of yylex in scanner.l
 
   To compile: 
   bison -o parser.cpp -d parser.y
 
-  Note : We used the -d option for Bison to generate the compiler_parser.hpp header file, which exports our token declarations and token creation functions, allowing us to use them in Flex.
+  Note : We used the -d option for Bison to generate the compiler_parser.hpp header file, which exports our token declarations and token 
+  creation functions, allowing us to use them in Flex.
  */
 %}
 

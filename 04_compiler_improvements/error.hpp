@@ -1,6 +1,6 @@
 #pragma once
 #include <exception>
-#include "type.hpp"
+#include "langtypes.hpp"
 
 struct type_error : std::exception{
     std::string description;
