@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.5.1.
+// A Bison parser, made by GNU Bison 3.8.2.
 
 // Skeleton implementation for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015, 2018-2020 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018-2021 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // As a special exception, you may create a larger work that contains
 // part or all of the Bison parser skeleton and distribute that work
@@ -30,8 +30,9 @@
 // This special exception was added by the Free Software Foundation in
 // version 2.2 of Bison.
 
-// Undocumented macros, especially those whose name start with YY_,
-// are private implementation details.  Do not rely on them.
+// DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+// especially those whose name start with YY_ or yy_.  They are
+// private implementation details that can be changed or removed.
 
 
 
@@ -44,23 +45,31 @@
   #include "parser.hpp"
 
   std::vector<definition_ptr> program;
-  extern yy::parser::symbol_type yylex();
+
+  extern yy::parser::symbol_type yylex(); // Declares the yylex() function, which is the lexer function responsible for tokenizing input.
+  // It returns a yy::parser::symbol_type object, which represents a token (with optional associated data, such as a value or type).
+  
   /*
-  Next, we must recognize that Bison was originally made for C, rather than C++. In order to allow the parser to store and operate on semantic values of various types, the canonical solution back in those times was to use a C union. Unions are great, but for C++, they’re more trouble than they’re worth: unions don’t allow for non-trivial constructors! This means that stuff like std::unique_ptr and std::string is off limits as a semantic value. But we’d really much rather use them! The solution is to:
+  Next, we must recognize that Bison was originally made for C, rather than C++. In order to allow the parser to store and operate on 
+  semantic values of various types, the canonical solution back in those times was to use a C union. Unions are great, but for C++, 
+  they’re more trouble than they’re worth: unions don’t allow for non-trivial constructors! This means that stuff like std::unique_ptr 
+  and std::string is off limits as a semantic value. But we’d really much rather use them! The solution is to:
    
       1. Specify the language to be C++, rather than C.
       2. Enable the variant API feature, which uses a lightweight std::variant alternative in place of a union.
       3. Enable the creation of token constructors, which we will use in Flex.
    
-  In order to be able to use the variant-based API, we also need to change the Flex yylex function to return yy::parser::symbol_type. You can see it in our forward declaration of yylex in scanner.l
+  In order to be able to use the variant-based API, we also need to change the Flex yylex function to return yy::parser::symbol_type. You can 
+  see it in our forward declaration of yylex in scanner.l
 
   To compile: 
   bison -o parser.cpp -d parser.y
 
-  Note : We used the -d option for Bison to generate the compiler_parser.hpp header file, which exports our token declarations and token creation functions, allowing us to use them in Flex.
+  Note : We used the -d option for Bison to generate the compiler_parser.hpp header file, which exports our token declarations and token 
+  creation functions, allowing us to use them in Flex.
  */
 
-#line 64 "parser.cpp"
+#line 73 "parser.cpp"
 
 
 #include "parser.hpp"
@@ -79,6 +88,7 @@
 #  define YY_(msgid) msgid
 # endif
 #endif
+
 
 // Whether we are compiled with exception support.
 #ifndef YY_EXCEPTIONS
@@ -116,13 +126,13 @@
 # define YY_STACK_PRINT()               \
   do {                                  \
     if (yydebug_)                       \
-      yystack_print_ ();                \
+      yy_stack_print_ ();                \
   } while (false)
 
 #else // !YYDEBUG
 
 # define YYCDEBUG if (false) std::cerr
-# define YY_SYMBOL_PRINT(Title, Symbol)  YYUSE (Symbol)
+# define YY_SYMBOL_PRINT(Title, Symbol)  YY_USE (Symbol)
 # define YY_REDUCE_PRINT(Rule)           static_cast<void> (0)
 # define YY_STACK_PRINT()                static_cast<void> (0)
 
@@ -137,8 +147,7 @@
 #define YYRECOVERING()  (!!yyerrstatus_)
 
 namespace yy {
-#line 141 "parser.cpp"
-
+#line 151 "parser.cpp"
 
   /// Build a parser object.
   parser::parser ()
@@ -156,9 +165,9 @@ namespace yy {
   parser::syntax_error::~syntax_error () YY_NOEXCEPT YY_NOTHROW
   {}
 
-  /*---------------.
-  | Symbol types.  |
-  `---------------*/
+  /*---------.
+  | symbol.  |
+  `---------*/
 
 
 
@@ -188,13 +197,13 @@ namespace yy {
     : state (s)
   {}
 
-  parser::symbol_number_type
-  parser::by_state::type_get () const YY_NOEXCEPT
+  parser::symbol_kind_type
+  parser::by_state::kind () const YY_NOEXCEPT
   {
     if (state == empty_state)
-      return empty_symbol;
+      return symbol_kind::S_YYEMPTY;
     else
-      return yystos_[+state];
+      return YY_CAST (symbol_kind_type, yystos_[+state]);
   }
 
   parser::stack_symbol_type::stack_symbol_type ()
@@ -203,58 +212,58 @@ namespace yy {
   parser::stack_symbol_type::stack_symbol_type (YY_RVREF (stack_symbol_type) that)
     : super_type (YY_MOVE (that.state))
   {
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         value.YY_MOVE_OR_COPY< ast_ptr > (YY_MOVE (that.value));
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         value.YY_MOVE_OR_COPY< branch_ptr > (YY_MOVE (that.value));
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         value.YY_MOVE_OR_COPY< constructor_ptr > (YY_MOVE (that.value));
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         value.YY_MOVE_OR_COPY< definition_ptr > (YY_MOVE (that.value));
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         value.YY_MOVE_OR_COPY< int > (YY_MOVE (that.value));
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         value.YY_MOVE_OR_COPY< pattern_ptr > (YY_MOVE (that.value));
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         value.YY_MOVE_OR_COPY< std::string > (YY_MOVE (that.value));
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         value.YY_MOVE_OR_COPY< std::vector<branch_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         value.YY_MOVE_OR_COPY< std::vector<constructor_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         value.YY_MOVE_OR_COPY< std::vector<definition_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         value.YY_MOVE_OR_COPY< std::vector<std::string> > (YY_MOVE (that.value));
         break;
 
@@ -271,58 +280,58 @@ namespace yy {
   parser::stack_symbol_type::stack_symbol_type (state_type s, YY_MOVE_REF (symbol_type) that)
     : super_type (s)
   {
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         value.move< ast_ptr > (YY_MOVE (that.value));
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         value.move< branch_ptr > (YY_MOVE (that.value));
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         value.move< constructor_ptr > (YY_MOVE (that.value));
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         value.move< definition_ptr > (YY_MOVE (that.value));
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         value.move< int > (YY_MOVE (that.value));
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         value.move< pattern_ptr > (YY_MOVE (that.value));
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         value.move< std::string > (YY_MOVE (that.value));
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         value.move< std::vector<branch_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         value.move< std::vector<constructor_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         value.move< std::vector<definition_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         value.move< std::vector<std::string> > (YY_MOVE (that.value));
         break;
 
@@ -331,7 +340,7 @@ namespace yy {
     }
 
     // that is emptied.
-    that.type = empty_symbol;
+    that.kind_ = symbol_kind::S_YYEMPTY;
   }
 
 #if YY_CPLUSPLUS < 201103L
@@ -339,58 +348,58 @@ namespace yy {
   parser::stack_symbol_type::operator= (const stack_symbol_type& that)
   {
     state = that.state;
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         value.copy< ast_ptr > (that.value);
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         value.copy< branch_ptr > (that.value);
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         value.copy< constructor_ptr > (that.value);
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         value.copy< definition_ptr > (that.value);
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         value.copy< int > (that.value);
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         value.copy< pattern_ptr > (that.value);
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         value.copy< std::string > (that.value);
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         value.copy< std::vector<branch_ptr> > (that.value);
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         value.copy< std::vector<constructor_ptr> > (that.value);
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         value.copy< std::vector<definition_ptr> > (that.value);
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         value.copy< std::vector<std::string> > (that.value);
         break;
 
@@ -405,58 +414,58 @@ namespace yy {
   parser::stack_symbol_type::operator= (stack_symbol_type& that)
   {
     state = that.state;
-    switch (that.type_get ())
+    switch (that.kind ())
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         value.move< ast_ptr > (that.value);
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         value.move< branch_ptr > (that.value);
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         value.move< constructor_ptr > (that.value);
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         value.move< definition_ptr > (that.value);
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         value.move< int > (that.value);
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         value.move< pattern_ptr > (that.value);
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         value.move< std::string > (that.value);
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         value.move< std::vector<branch_ptr> > (that.value);
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         value.move< std::vector<constructor_ptr> > (that.value);
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         value.move< std::vector<definition_ptr> > (that.value);
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         value.move< std::vector<std::string> > (that.value);
         break;
 
@@ -481,22 +490,20 @@ namespace yy {
 #if YYDEBUG
   template <typename Base>
   void
-  parser::yy_print_ (std::ostream& yyo,
-                                     const basic_symbol<Base>& yysym) const
+  parser::yy_print_ (std::ostream& yyo, const basic_symbol<Base>& yysym) const
   {
     std::ostream& yyoutput = yyo;
-    YYUSE (yyoutput);
-    symbol_number_type yytype = yysym.type_get ();
-#if defined __GNUC__ && ! defined __clang__ && ! defined __ICC && __GNUC__ * 100 + __GNUC_MINOR__ <= 408
-    // Avoid a (spurious) G++ 4.8 warning about "array subscript is
-    // below array bounds".
+    YY_USE (yyoutput);
     if (yysym.empty ())
-      std::abort ();
-#endif
-    yyo << (yytype < yyntokens_ ? "token" : "nterm")
-        << ' ' << yytname_[yytype] << " (";
-    YYUSE (yytype);
-    yyo << ')';
+      yyo << "empty symbol";
+    else
+      {
+        symbol_kind_type yykind = yysym.kind ();
+        yyo << (yykind < YYNTOKENS ? "token" : "nterm")
+            << ' ' << yysym.name () << " (";
+        YY_USE (yykind);
+        yyo << ')';
+      }
   }
 #endif
 
@@ -520,7 +527,7 @@ namespace yy {
   }
 
   void
-  parser::yypop_ (int n)
+  parser::yypop_ (int n) YY_NOEXCEPT
   {
     yystack_.pop (n);
   }
@@ -555,21 +562,21 @@ namespace yy {
   parser::state_type
   parser::yy_lr_goto_state_ (state_type yystate, int yysym)
   {
-    int yyr = yypgoto_[yysym - yyntokens_] + yystate;
+    int yyr = yypgoto_[yysym - YYNTOKENS] + yystate;
     if (0 <= yyr && yyr <= yylast_ && yycheck_[yyr] == yystate)
       return yytable_[yyr];
     else
-      return yydefgoto_[yysym - yyntokens_];
+      return yydefgoto_[yysym - YYNTOKENS];
   }
 
   bool
-  parser::yy_pact_value_is_default_ (int yyvalue)
+  parser::yy_pact_value_is_default_ (int yyvalue) YY_NOEXCEPT
   {
     return yyvalue == yypact_ninf_;
   }
 
   bool
-  parser::yy_table_value_is_error_ (int yyvalue)
+  parser::yy_table_value_is_error_ (int yyvalue) YY_NOEXCEPT
   {
     return yyvalue == yytable_ninf_;
   }
@@ -616,6 +623,7 @@ namespace yy {
   `-----------------------------------------------*/
   yynewstate:
     YYCDEBUG << "Entering state " << int (yystack_[0].state) << '\n';
+    YY_STACK_PRINT ();
 
     // Accept?
     if (yystack_[0].state == yyfinal_)
@@ -636,7 +644,7 @@ namespace yy {
     // Read a lookahead token.
     if (yyla.empty ())
       {
-        YYCDEBUG << "Reading a token: ";
+        YYCDEBUG << "Reading a token\n";
 #if YY_EXCEPTIONS
         try
 #endif // YY_EXCEPTIONS
@@ -655,10 +663,20 @@ namespace yy {
       }
     YY_SYMBOL_PRINT ("Next token is", yyla);
 
+    if (yyla.kind () == symbol_kind::S_YYerror)
+    {
+      // The scanner already issued an error message, process directly
+      // to error recovery.  But do not keep the error token as
+      // lookahead, it is too special and may lead us to an endless
+      // loop in error recovery. */
+      yyla.kind_ = symbol_kind::S_YYUNDEF;
+      goto yyerrlab1;
+    }
+
     /* If the proper action on seeing token YYLA.TYPE is to reduce or
        to detect an error, take that action.  */
-    yyn += yyla.type_get ();
-    if (yyn < 0 || yylast_ < yyn || yycheck_[yyn] != yyla.type_get ())
+    yyn += yyla.kind ();
+    if (yyn < 0 || yylast_ < yyn || yycheck_[yyn] != yyla.kind ())
       {
         goto yydefault;
       }
@@ -705,56 +723,56 @@ namespace yy {
          when using variants.  */
       switch (yyr1_[yyn])
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         yylhs.value.emplace< ast_ptr > ();
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         yylhs.value.emplace< branch_ptr > ();
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         yylhs.value.emplace< constructor_ptr > ();
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         yylhs.value.emplace< definition_ptr > ();
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         yylhs.value.emplace< int > ();
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         yylhs.value.emplace< pattern_ptr > ();
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         yylhs.value.emplace< std::string > ();
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         yylhs.value.emplace< std::vector<branch_ptr> > ();
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         yylhs.value.emplace< std::vector<constructor_ptr> > ();
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         yylhs.value.emplace< std::vector<definition_ptr> > ();
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         yylhs.value.emplace< std::vector<std::string> > ();
         break;
 
@@ -772,206 +790,206 @@ namespace yy {
         {
           switch (yyn)
             {
-  case 2:
-#line 62 "parser.y"
+  case 2: // program: definitions
+#line 70 "parser.y"
                   { program = std::move(yystack_[0].value.as < std::vector<definition_ptr> > ()); }
-#line 779 "parser.cpp"
-    break;
-
-  case 3:
-#line 66 "parser.y"
-                             { yylhs.value.as < std::vector<definition_ptr> > () = std::move(yystack_[1].value.as < std::vector<definition_ptr> > ()); yylhs.value.as < std::vector<definition_ptr> > ().push_back(std::move(yystack_[0].value.as < definition_ptr > ())); }
-#line 785 "parser.cpp"
-    break;
-
-  case 4:
-#line 67 "parser.y"
-                 { yylhs.value.as < std::vector<definition_ptr> > () = std::vector<definition_ptr>() ; yylhs.value.as < std::vector<definition_ptr> > ().push_back(std::move(yystack_[0].value.as < definition_ptr > ())); }
-#line 791 "parser.cpp"
-    break;
-
-  case 5:
-#line 71 "parser.y"
-           { yylhs.value.as < definition_ptr > () = std::move(yystack_[0].value.as < definition_ptr > ()); }
 #line 797 "parser.cpp"
     break;
 
-  case 6:
-#line 72 "parser.y"
-           { yylhs.value.as < definition_ptr > () = std::move(yystack_[0].value.as < definition_ptr > ());}
+  case 3: // definitions: definitions definition
+#line 74 "parser.y"
+                             { yylhs.value.as < std::vector<definition_ptr> > () = std::move(yystack_[1].value.as < std::vector<definition_ptr> > ()); yylhs.value.as < std::vector<definition_ptr> > ().push_back(std::move(yystack_[0].value.as < definition_ptr > ())); }
 #line 803 "parser.cpp"
     break;
 
-  case 7:
-#line 76 "parser.y"
-                                                        { yylhs.value.as < definition_ptr > () = definition_ptr(new definition_defn(std::move(yystack_[5].value.as < std::string > ()), std::move(yystack_[4].value.as < std::vector<std::string> > ()), std::move(yystack_[1].value.as < ast_ptr > ())));}
+  case 4: // definitions: definition
+#line 75 "parser.y"
+                 { yylhs.value.as < std::vector<definition_ptr> > () = std::vector<definition_ptr>() ; yylhs.value.as < std::vector<definition_ptr> > ().push_back(std::move(yystack_[0].value.as < definition_ptr > ())); }
 #line 809 "parser.cpp"
     break;
 
-  case 8:
-#line 80 "parser.y"
-             { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); }
+  case 5: // definition: defn
+#line 79 "parser.y"
+           { yylhs.value.as < definition_ptr > () = std::move(yystack_[0].value.as < definition_ptr > ()); }
 #line 815 "parser.cpp"
     break;
 
-  case 9:
-#line 81 "parser.y"
-                          { yylhs.value.as < std::vector<std::string> > () = std::move(yystack_[1].value.as < std::vector<std::string> > ()); yylhs.value.as < std::vector<std::string> > ().push_back(std::move(yystack_[0].value.as < std::string > ())); }
+  case 6: // definition: data
+#line 80 "parser.y"
+           { yylhs.value.as < definition_ptr > () = std::move(yystack_[0].value.as < definition_ptr > ());}
 #line 821 "parser.cpp"
     break;
 
-  case 10:
-#line 85 "parser.y"
-             { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); }
+  case 7: // defn: DEFN LID lowercaseParams EQUAL OCURLY aAdd CCURLY
+#line 84 "parser.y"
+                                                        { yylhs.value.as < definition_ptr > () = definition_ptr(new definition_defn(std::move(yystack_[5].value.as < std::string > ()), std::move(yystack_[4].value.as < std::vector<std::string> > ()), std::move(yystack_[1].value.as < ast_ptr > ())));}
 #line 827 "parser.cpp"
     break;
 
-  case 11:
-#line 86 "parser.y"
-                          { yylhs.value.as < std::vector<std::string> > () = std::move(yystack_[1].value.as < std::vector<std::string> > ()); yylhs.value.as < std::vector<std::string> > ().push_back(std::move(yystack_[0].value.as < std::string > ())); }
+  case 8: // lowercaseParams: %empty
+#line 88 "parser.y"
+             { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); }
 #line 833 "parser.cpp"
     break;
 
-  case 12:
-#line 90 "parser.y"
-                     { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(PLUS, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
+  case 9: // lowercaseParams: lowercaseParams LID
+#line 89 "parser.y"
+                          { yylhs.value.as < std::vector<std::string> > () = std::move(yystack_[1].value.as < std::vector<std::string> > ()); yylhs.value.as < std::vector<std::string> > ().push_back(std::move(yystack_[0].value.as < std::string > ())); }
 #line 839 "parser.cpp"
     break;
 
-  case 13:
-#line 91 "parser.y"
-                      { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(MINUS, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
+  case 10: // uppercaseParams: %empty
+#line 93 "parser.y"
+             { yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>(); }
 #line 845 "parser.cpp"
     break;
 
-  case 14:
-#line 92 "parser.y"
-           { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
+  case 11: // uppercaseParams: uppercaseParams UID
+#line 94 "parser.y"
+                          { yylhs.value.as < std::vector<std::string> > () = std::move(yystack_[1].value.as < std::vector<std::string> > ()); yylhs.value.as < std::vector<std::string> > ().push_back(std::move(yystack_[0].value.as < std::string > ())); }
 #line 851 "parser.cpp"
     break;
 
-  case 15:
-#line 96 "parser.y"
-                     { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(TIMES, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
+  case 12: // aAdd: aAdd PLUS aMul
+#line 98 "parser.y"
+                     { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(PLUS, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
 #line 857 "parser.cpp"
     break;
 
-  case 16:
-#line 97 "parser.y"
-                      { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(DIVIDE, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
+  case 13: // aAdd: aAdd MINUS aMul
+#line 99 "parser.y"
+                      { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(MINUS, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
 #line 863 "parser.cpp"
     break;
 
-  case 17:
-#line 98 "parser.y"
-          { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
+  case 14: // aAdd: aMul
+#line 100 "parser.y"
+           { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
 #line 869 "parser.cpp"
     break;
 
-  case 18:
-#line 102 "parser.y"
-                  { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_app(std::move(yystack_[1].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
+  case 15: // aMul: aMul TIMES app
+#line 104 "parser.y"
+                     { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(TIMES, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
 #line 875 "parser.cpp"
     break;
 
-  case 19:
-#line 103 "parser.y"
-              { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
+  case 16: // aMul: aMul DIVIDE app
+#line 105 "parser.y"
+                      { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_binop(DIVIDE, std::move(yystack_[2].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
 #line 881 "parser.cpp"
     break;
 
-  case 20:
-#line 107 "parser.y"
-          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_int(yystack_[0].value.as < int > ())); }
+  case 17: // aMul: app
+#line 106 "parser.y"
+          { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
 #line 887 "parser.cpp"
     break;
 
-  case 21:
-#line 108 "parser.y"
-          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_lid(std::move(yystack_[0].value.as < std::string > ()))); }
+  case 18: // app: app appBase
+#line 110 "parser.y"
+                  { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_app(std::move(yystack_[1].value.as < ast_ptr > ()), std::move(yystack_[0].value.as < ast_ptr > ()))); }
 #line 893 "parser.cpp"
     break;
 
-  case 22:
-#line 109 "parser.y"
-          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_uid(std::move(yystack_[0].value.as < std::string > ()))); }
+  case 19: // app: appBase
+#line 111 "parser.y"
+              { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
 #line 899 "parser.cpp"
     break;
 
-  case 23:
-#line 110 "parser.y"
-                        { yylhs.value.as < ast_ptr > () = std::move(yystack_[1].value.as < ast_ptr > ()); }
+  case 20: // appBase: INT
+#line 115 "parser.y"
+          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_int(yystack_[0].value.as < int > ())); }
 #line 905 "parser.cpp"
     break;
 
-  case 24:
-#line 111 "parser.y"
-           { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
+  case 21: // appBase: LID
+#line 116 "parser.y"
+          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_lid(std::move(yystack_[0].value.as < std::string > ()))); }
 #line 911 "parser.cpp"
     break;
 
-  case 25:
-#line 115 "parser.y"
-                                          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_case(std::move(yystack_[4].value.as < ast_ptr > ()), std::move(yystack_[1].value.as < std::vector<branch_ptr> > ()))); }
+  case 22: // appBase: UID
+#line 117 "parser.y"
+          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_uid(std::move(yystack_[0].value.as < std::string > ()))); }
 #line 917 "parser.cpp"
     break;
 
-  case 26:
-#line 119 "parser.y"
-                      { yylhs.value.as < std::vector<branch_ptr> > () = std::move(yystack_[1].value.as < std::vector<branch_ptr> > ()); yystack_[1].value.as < std::vector<branch_ptr> > ().push_back(std::move(yystack_[0].value.as < branch_ptr > ())); }
+  case 23: // appBase: OPAREN aAdd CPAREN
+#line 118 "parser.y"
+                        { yylhs.value.as < ast_ptr > () = std::move(yystack_[1].value.as < ast_ptr > ()); }
 #line 923 "parser.cpp"
     break;
 
-  case 27:
-#line 120 "parser.y"
-             { yylhs.value.as < std::vector<branch_ptr> > () = std::vector<branch_ptr>(); yylhs.value.as < std::vector<branch_ptr> > ().push_back(std::move(yystack_[0].value.as < branch_ptr > ())); }
+  case 24: // appBase: case
+#line 119 "parser.y"
+           { yylhs.value.as < ast_ptr > () = std::move(yystack_[0].value.as < ast_ptr > ()); }
 #line 929 "parser.cpp"
     break;
 
-  case 28:
-#line 124 "parser.y"
-                                       { yylhs.value.as < branch_ptr > () = branch_ptr(new branch(std::move(yystack_[4].value.as < pattern_ptr > ()), std::move(yystack_[1].value.as < ast_ptr > ()))); }
+  case 25: // case: CASE aAdd OF OCURLY branches CCURLY
+#line 123 "parser.y"
+                                          { yylhs.value.as < ast_ptr > () = ast_ptr(new ast_case(std::move(yystack_[4].value.as < ast_ptr > ()), std::move(yystack_[1].value.as < std::vector<branch_ptr> > ()))); }
 #line 935 "parser.cpp"
     break;
 
-  case 29:
-#line 128 "parser.y"
-          { yylhs.value.as < pattern_ptr > () = pattern_ptr(new pattern_var(std::move(yystack_[0].value.as < std::string > ()))); }
+  case 26: // branches: branches branch
+#line 127 "parser.y"
+                      { yylhs.value.as < std::vector<branch_ptr> > () = std::move(yystack_[1].value.as < std::vector<branch_ptr> > ()); yystack_[1].value.as < std::vector<branch_ptr> > ().push_back(std::move(yystack_[0].value.as < branch_ptr > ())); }
 #line 941 "parser.cpp"
     break;
 
-  case 30:
-#line 129 "parser.y"
-                          { yylhs.value.as < pattern_ptr > () = pattern_ptr(new pattern_constr(std::move(yystack_[1].value.as < std::string > ()), std::move(yystack_[0].value.as < std::vector<std::string> > ()))); }
+  case 27: // branches: branch
+#line 128 "parser.y"
+             { yylhs.value.as < std::vector<branch_ptr> > () = std::vector<branch_ptr>(); yylhs.value.as < std::vector<branch_ptr> > ().push_back(std::move(yystack_[0].value.as < branch_ptr > ())); }
 #line 947 "parser.cpp"
     break;
 
-  case 31:
-#line 133 "parser.y"
-                                                { yylhs.value.as < definition_ptr > () = definition_ptr(new definition_data(std::move(yystack_[4].value.as < std::string > ()), std::move(yystack_[1].value.as < std::vector<constructor_ptr> > ()))); }
+  case 28: // branch: pattern ARROW OCURLY aAdd CCURLY
+#line 132 "parser.y"
+                                       { yylhs.value.as < branch_ptr > () = branch_ptr(new branch(std::move(yystack_[4].value.as < pattern_ptr > ()), std::move(yystack_[1].value.as < ast_ptr > ()))); }
 #line 953 "parser.cpp"
     break;
 
-  case 32:
-#line 137 "parser.y"
-                                     { yylhs.value.as < std::vector<constructor_ptr> > () = std::move(yystack_[2].value.as < std::vector<constructor_ptr> > ()); yylhs.value.as < std::vector<constructor_ptr> > ().push_back(std::move(yystack_[0].value.as < constructor_ptr > ())); }
+  case 29: // pattern: LID
+#line 136 "parser.y"
+          { yylhs.value.as < pattern_ptr > () = pattern_ptr(new pattern_var(std::move(yystack_[0].value.as < std::string > ()))); }
 #line 959 "parser.cpp"
     break;
 
-  case 33:
-#line 138 "parser.y"
-                  { yylhs.value.as < std::vector<constructor_ptr> > () = std::vector<constructor_ptr>(); yylhs.value.as < std::vector<constructor_ptr> > ().push_back(std::move(yystack_[0].value.as < constructor_ptr > ())); }
+  case 30: // pattern: UID lowercaseParams
+#line 137 "parser.y"
+                          { yylhs.value.as < pattern_ptr > () = pattern_ptr(new pattern_constr(std::move(yystack_[1].value.as < std::string > ()), std::move(yystack_[0].value.as < std::vector<std::string> > ()))); }
 #line 965 "parser.cpp"
     break;
 
-  case 34:
-#line 142 "parser.y"
-                          { yylhs.value.as < constructor_ptr > () = constructor_ptr(new constructor(std::move(yystack_[1].value.as < std::string > ()), std::move(yystack_[0].value.as < std::vector<std::string> > ()))); }
+  case 31: // data: DATA UID EQUAL OCURLY constructors CCURLY
+#line 141 "parser.y"
+                                                { yylhs.value.as < definition_ptr > () = definition_ptr(new definition_data(std::move(yystack_[4].value.as < std::string > ()), std::move(yystack_[1].value.as < std::vector<constructor_ptr> > ()))); }
 #line 971 "parser.cpp"
     break;
 
+  case 32: // constructors: constructors COMMA constructor
+#line 145 "parser.y"
+                                     { yylhs.value.as < std::vector<constructor_ptr> > () = std::move(yystack_[2].value.as < std::vector<constructor_ptr> > ()); yylhs.value.as < std::vector<constructor_ptr> > ().push_back(std::move(yystack_[0].value.as < constructor_ptr > ())); }
+#line 977 "parser.cpp"
+    break;
 
-#line 975 "parser.cpp"
+  case 33: // constructors: constructor
+#line 146 "parser.y"
+                  { yylhs.value.as < std::vector<constructor_ptr> > () = std::vector<constructor_ptr>(); yylhs.value.as < std::vector<constructor_ptr> > ().push_back(std::move(yystack_[0].value.as < constructor_ptr > ())); }
+#line 983 "parser.cpp"
+    break;
+
+  case 34: // constructor: UID uppercaseParams
+#line 150 "parser.y"
+                          { yylhs.value.as < constructor_ptr > () = constructor_ptr(new constructor(std::move(yystack_[1].value.as < std::string > ()), std::move(yystack_[0].value.as < std::vector<std::string> > ()))); }
+#line 989 "parser.cpp"
+    break;
+
+
+#line 993 "parser.cpp"
 
             default:
               break;
@@ -988,7 +1006,6 @@ namespace yy {
       YY_SYMBOL_PRINT ("-> $$ =", yylhs);
       yypop_ (yylen);
       yylen = 0;
-      YY_STACK_PRINT ();
 
       // Shift the result of the reduction.
       yypush_ (YY_NULLPTR, YY_MOVE (yylhs));
@@ -1004,7 +1021,8 @@ namespace yy {
     if (!yyerrstatus_)
       {
         ++yynerrs_;
-        error (yysyntax_error_ (yystack_[0].state, yyla));
+        std::string msg = YY_("syntax error");
+        error (YY_MOVE (msg));
       }
 
 
@@ -1014,7 +1032,7 @@ namespace yy {
            error, discard it.  */
 
         // Return failure if at end of input.
-        if (yyla.type_get () == yyeof_)
+        if (yyla.kind () == symbol_kind::S_YYEOF)
           YYABORT;
         else if (!yyla.empty ())
           {
@@ -1040,6 +1058,7 @@ namespace yy {
        this YYERROR.  */
     yypop_ (yylen);
     yylen = 0;
+    YY_STACK_PRINT ();
     goto yyerrlab1;
 
 
@@ -1048,30 +1067,32 @@ namespace yy {
   `-------------------------------------------------------------*/
   yyerrlab1:
     yyerrstatus_ = 3;   // Each real token shifted decrements this.
+    // Pop stack until we find a state that shifts the error token.
+    for (;;)
+      {
+        yyn = yypact_[+yystack_[0].state];
+        if (!yy_pact_value_is_default_ (yyn))
+          {
+            yyn += symbol_kind::S_YYerror;
+            if (0 <= yyn && yyn <= yylast_
+                && yycheck_[yyn] == symbol_kind::S_YYerror)
+              {
+                yyn = yytable_[yyn];
+                if (0 < yyn)
+                  break;
+              }
+          }
+
+        // Pop the current state because it cannot handle the error token.
+        if (yystack_.size () == 1)
+          YYABORT;
+
+        yy_destroy_ ("Error: popping", yystack_[0]);
+        yypop_ ();
+        YY_STACK_PRINT ();
+      }
     {
       stack_symbol_type error_token;
-      for (;;)
-        {
-          yyn = yypact_[+yystack_[0].state];
-          if (!yy_pact_value_is_default_ (yyn))
-            {
-              yyn += yy_error_token_;
-              if (0 <= yyn && yyn <= yylast_ && yycheck_[yyn] == yy_error_token_)
-                {
-                  yyn = yytable_[yyn];
-                  if (0 < yyn)
-                    break;
-                }
-            }
-
-          // Pop the current state because it cannot handle the error token.
-          if (yystack_.size () == 1)
-            YYABORT;
-
-          yy_destroy_ ("Error: popping", yystack_[0]);
-          yypop_ ();
-          YY_STACK_PRINT ();
-        }
 
 
       // Shift the error token.
@@ -1107,6 +1128,7 @@ namespace yy {
     /* Do not reclaim the symbols of the rule whose action triggered
        this YYABORT or YYACCEPT.  */
     yypop_ (yylen);
+    YY_STACK_PRINT ();
     while (1 < yystack_.size ())
       {
         yy_destroy_ ("Cleanup: popping", yystack_[0]);
@@ -1140,12 +1162,20 @@ namespace yy {
     error (yyexc.what ());
   }
 
-  // Generate an error message.
-  std::string
-  parser::yysyntax_error_ (state_type, const symbol_type&) const
+#if YYDEBUG || 0
+  const char *
+  parser::symbol_name (symbol_kind_type yysymbol)
   {
-    return YY_("syntax error");
+    return yytname_[yysymbol];
   }
+#endif // #if YYDEBUG || 0
+
+
+
+
+
+
+
 
 
   const signed char parser::yypact_ninf_ = -27;
@@ -1186,7 +1216,7 @@ namespace yy {
   const signed char
   parser::yydefgoto_[] =
   {
-      -1,     3,     4,     5,     6,    12,    31,    26,    27,    28,
+       0,     3,     4,     5,     6,    12,    31,    26,    27,    28,
       29,    30,    53,    54,    55,     7,    19,    20
   };
 
@@ -1247,31 +1277,33 @@ namespace yy {
 
 #if YYDEBUG
   // YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
-  // First, the terminals, then, starting at \a yyntokens_, nonterminals.
+  // First, the terminals, then, starting at \a YYNTOKENS, nonterminals.
   const char*
   const parser::yytname_[] =
   {
-  "$end", "error", "$undefined", "PLUS", "TIMES", "MINUS", "DIVIDE",
-  "INT", "DEFN", "DATA", "CASE", "OF", "OCURLY", "CCURLY", "OPAREN",
-  "CPAREN", "COMMA", "ARROW", "EQUAL", "LID", "UID", "$accept", "program",
-  "definitions", "definition", "defn", "lowercaseParams",
-  "uppercaseParams", "aAdd", "aMul", "app", "appBase", "case", "branches",
-  "branch", "pattern", "data", "constructors", "constructor", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "PLUS", "TIMES",
+  "MINUS", "DIVIDE", "INT", "DEFN", "DATA", "CASE", "OF", "OCURLY",
+  "CCURLY", "OPAREN", "CPAREN", "COMMA", "ARROW", "EQUAL", "LID", "UID",
+  "$accept", "program", "definitions", "definition", "defn",
+  "lowercaseParams", "uppercaseParams", "aAdd", "aMul", "app", "appBase",
+  "case", "branches", "branch", "pattern", "data", "constructors",
+  "constructor", YY_NULLPTR
   };
+#endif
 
 
+#if YYDEBUG
   const unsigned char
   parser::yyrline_[] =
   {
-       0,    62,    62,    66,    67,    71,    72,    76,    80,    81,
-      85,    86,    90,    91,    92,    96,    97,    98,   102,   103,
-     107,   108,   109,   110,   111,   115,   119,   120,   124,   128,
-     129,   133,   137,   138,   142
+       0,    70,    70,    74,    75,    79,    80,    84,    88,    89,
+      93,    94,    98,    99,   100,   104,   105,   106,   110,   111,
+     115,   116,   117,   118,   119,   123,   127,   128,   132,   136,
+     137,   141,   145,   146,   150
   };
 
-  // Print the state stack on the debug stream.
   void
-  parser::yystack_print_ ()
+  parser::yy_stack_print_ () const
   {
     *yycdebug_ << "Stack now";
     for (stack_type::const_iterator
@@ -1282,9 +1314,8 @@ namespace yy {
     *yycdebug_ << '\n';
   }
 
-  // Report on the debug stream that the rule \a yyrule is going to be reduced.
   void
-  parser::yy_reduce_print_ (int yyrule)
+  parser::yy_reduce_print_ (int yyrule) const
   {
     int yylno = yyrline_[yyrule];
     int yynrhs = yyr2_[yyrule];
@@ -1300,5 +1331,5 @@ namespace yy {
 
 
 } // yy
-#line 1304 "parser.cpp"
+#line 1335 "parser.cpp"
 

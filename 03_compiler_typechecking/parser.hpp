@@ -1,8 +1,8 @@
-// A Bison parser, made by GNU Bison 3.5.1.
+// A Bison parser, made by GNU Bison 3.8.2.
 
 // Skeleton interface for Bison LALR(1) parsers in C++
 
-// Copyright (C) 2002-2015, 2018-2020 Free Software Foundation, Inc.
+// Copyright (C) 2002-2015, 2018-2021 Free Software Foundation, Inc.
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // As a special exception, you may create a larger work that contains
 // part or all of the Bison parser skeleton and distribute that work
@@ -38,8 +38,9 @@
 
 // C++ LALR(1) parser skeleton written by Akim Demaille.
 
-// Undocumented macros, especially those whose name start with YY_,
-// are private implementation details.  Do not rely on them.
+// DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+// especially those whose name start with YY_ or yy_.  They are
+// private implementation details that can be changed or removed.
 
 #ifndef YY_YY_PARSER_HPP_INCLUDED
 # define YY_YY_PARSER_HPP_INCLUDED
@@ -89,11 +90,6 @@
 #endif
 
 
-#ifndef YY_ASSERT
-# include <cassert>
-# define YY_ASSERT assert
-#endif
-
 
 #ifndef YY_ATTRIBUTE_PURE
 # if defined __GNUC__ && 2 < __GNUC__ + (96 <= __GNUC_MINOR__)
@@ -113,17 +109,23 @@
 
 /* Suppress unused-variable warnings by "using" E.  */
 #if ! defined lint || defined __GNUC__
-# define YYUSE(E) ((void) (E))
+# define YY_USE(E) ((void) (E))
 #else
-# define YYUSE(E) /* empty */
+# define YY_USE(E) /* empty */
 #endif
 
-#if defined __GNUC__ && ! defined __ICC && 407 <= __GNUC__ * 100 + __GNUC_MINOR__
 /* Suppress an incorrect diagnostic about yylval being uninitialized.  */
-# define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                            \
+#if defined __GNUC__ && ! defined __ICC && 406 <= __GNUC__ * 100 + __GNUC_MINOR__
+# if __GNUC__ * 100 + __GNUC_MINOR__ < 407
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
+    _Pragma ("GCC diagnostic push")                                     \
+    _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")
+# else
+#  define YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN                           \
     _Pragma ("GCC diagnostic push")                                     \
     _Pragma ("GCC diagnostic ignored \"-Wuninitialized\"")              \
     _Pragma ("GCC diagnostic ignored \"-Wmaybe-uninitialized\"")
+# endif
 # define YY_IGNORE_MAYBE_UNINITIALIZED_END      \
     _Pragma ("GCC diagnostic pop")
 #else
@@ -176,7 +178,7 @@
 #endif
 
 namespace yy {
-#line 180 "parser.hpp"
+#line 182 "parser.hpp"
 
 
 
@@ -185,33 +187,44 @@ namespace yy {
   class parser
   {
   public:
-#ifndef YYSTYPE
+#ifdef YYSTYPE
+# ifdef __GNUC__
+#  pragma GCC message "bison: do not #define YYSTYPE in C++, use %define api.value.type"
+# endif
+    typedef YYSTYPE value_type;
+#else
   /// A buffer to store and retrieve objects.
   ///
   /// Sort of a variant, but does not keep track of the nature
   /// of the stored data, since that knowledge is available
   /// via the current parser state.
-  class semantic_type
+  class value_type
   {
   public:
     /// Type of *this.
-    typedef semantic_type self_type;
+    typedef value_type self_type;
 
     /// Empty construction.
-    semantic_type () YY_NOEXCEPT
-      : yybuffer_ ()
+    value_type () YY_NOEXCEPT
+      : yyraw_ ()
     {}
 
     /// Construct and fill.
     template <typename T>
-    semantic_type (YY_RVREF (T) t)
+    value_type (YY_RVREF (T) t)
     {
-      YY_ASSERT (sizeof (T) <= size);
       new (yyas_<T> ()) T (YY_MOVE (t));
     }
 
+#if 201103L <= YY_CPLUSPLUS
+    /// Non copyable.
+    value_type (const self_type&) = delete;
+    /// Non copyable.
+    self_type& operator= (const self_type&) = delete;
+#endif
+
     /// Destruction, allowed only if empty.
-    ~semantic_type () YY_NOEXCEPT
+    ~value_type () YY_NOEXCEPT
     {}
 
 # if 201103L <= YY_CPLUSPLUS
@@ -333,16 +346,19 @@ namespace yy {
     }
 
   private:
-    /// Prohibit blind copies.
+#if YY_CPLUSPLUS < 201103L
+    /// Non copyable.
+    value_type (const self_type&);
+    /// Non copyable.
     self_type& operator= (const self_type&);
-    semantic_type (const self_type&);
+#endif
 
     /// Accessor to raw memory as \a T.
     template <typename T>
     T*
     yyas_ () YY_NOEXCEPT
     {
-      void *yyp = yybuffer_.yyraw;
+      void *yyp = yyraw_;
       return static_cast<T*> (yyp);
      }
 
@@ -351,7 +367,7 @@ namespace yy {
     const T*
     yyas_ () const YY_NOEXCEPT
     {
-      const void *yyp = yybuffer_.yyraw;
+      const void *yyp = yyraw_;
       return static_cast<const T*> (yyp);
      }
 
@@ -408,15 +424,16 @@ namespace yy {
     union
     {
       /// Strongest alignment constraints.
-      long double yyalign_me;
+      long double yyalign_me_;
       /// A buffer large enough to store any of the semantic values.
-      char yyraw[size];
-    } yybuffer_;
+      char yyraw_[size];
+    };
   };
 
-#else
-    typedef YYSTYPE semantic_type;
 #endif
+    /// Backward compatibility (Bison 3.8).
+    typedef value_type semantic_type;
+
 
     /// Syntax errors thrown from user actions.
     struct syntax_error : std::runtime_error
@@ -432,48 +449,103 @@ namespace yy {
       ~syntax_error () YY_NOEXCEPT YY_NOTHROW;
     };
 
-    /// Tokens.
+    /// Token kinds.
     struct token
     {
-      enum yytokentype
+      enum token_kind_type
       {
-        PLUS = 258,
-        TIMES = 259,
-        MINUS = 260,
-        DIVIDE = 261,
-        INT = 262,
-        DEFN = 263,
-        DATA = 264,
-        CASE = 265,
-        OF = 266,
-        OCURLY = 267,
-        CCURLY = 268,
-        OPAREN = 269,
-        CPAREN = 270,
-        COMMA = 271,
-        ARROW = 272,
-        EQUAL = 273,
-        LID = 274,
-        UID = 275
+        YYEMPTY = -2,
+    YYEOF = 0,                     // "end of file"
+    YYerror = 256,                 // error
+    YYUNDEF = 257,                 // "invalid token"
+    PLUS = 258,                    // PLUS
+    TIMES = 259,                   // TIMES
+    MINUS = 260,                   // MINUS
+    DIVIDE = 261,                  // DIVIDE
+    INT = 262,                     // INT
+    DEFN = 263,                    // DEFN
+    DATA = 264,                    // DATA
+    CASE = 265,                    // CASE
+    OF = 266,                      // OF
+    OCURLY = 267,                  // OCURLY
+    CCURLY = 268,                  // CCURLY
+    OPAREN = 269,                  // OPAREN
+    CPAREN = 270,                  // CPAREN
+    COMMA = 271,                   // COMMA
+    ARROW = 272,                   // ARROW
+    EQUAL = 273,                   // EQUAL
+    LID = 274,                     // LID
+    UID = 275                      // UID
+      };
+      /// Backward compatibility alias (Bison 3.6).
+      typedef token_kind_type yytokentype;
+    };
+
+    /// Token kind, as returned by yylex.
+    typedef token::token_kind_type token_kind_type;
+
+    /// Backward compatibility alias (Bison 3.6).
+    typedef token_kind_type token_type;
+
+    /// Symbol kinds.
+    struct symbol_kind
+    {
+      enum symbol_kind_type
+      {
+        YYNTOKENS = 21, ///< Number of tokens.
+        S_YYEMPTY = -2,
+        S_YYEOF = 0,                             // "end of file"
+        S_YYerror = 1,                           // error
+        S_YYUNDEF = 2,                           // "invalid token"
+        S_PLUS = 3,                              // PLUS
+        S_TIMES = 4,                             // TIMES
+        S_MINUS = 5,                             // MINUS
+        S_DIVIDE = 6,                            // DIVIDE
+        S_INT = 7,                               // INT
+        S_DEFN = 8,                              // DEFN
+        S_DATA = 9,                              // DATA
+        S_CASE = 10,                             // CASE
+        S_OF = 11,                               // OF
+        S_OCURLY = 12,                           // OCURLY
+        S_CCURLY = 13,                           // CCURLY
+        S_OPAREN = 14,                           // OPAREN
+        S_CPAREN = 15,                           // CPAREN
+        S_COMMA = 16,                            // COMMA
+        S_ARROW = 17,                            // ARROW
+        S_EQUAL = 18,                            // EQUAL
+        S_LID = 19,                              // LID
+        S_UID = 20,                              // UID
+        S_YYACCEPT = 21,                         // $accept
+        S_program = 22,                          // program
+        S_definitions = 23,                      // definitions
+        S_definition = 24,                       // definition
+        S_defn = 25,                             // defn
+        S_lowercaseParams = 26,                  // lowercaseParams
+        S_uppercaseParams = 27,                  // uppercaseParams
+        S_aAdd = 28,                             // aAdd
+        S_aMul = 29,                             // aMul
+        S_app = 30,                              // app
+        S_appBase = 31,                          // appBase
+        S_case = 32,                             // case
+        S_branches = 33,                         // branches
+        S_branch = 34,                           // branch
+        S_pattern = 35,                          // pattern
+        S_data = 36,                             // data
+        S_constructors = 37,                     // constructors
+        S_constructor = 38                       // constructor
       };
     };
 
-    /// (External) token type, as returned by yylex.
-    typedef token::yytokentype token_type;
+    /// (Internal) symbol kind.
+    typedef symbol_kind::symbol_kind_type symbol_kind_type;
 
-    /// Symbol type: an internal symbol number.
-    typedef int symbol_number_type;
-
-    /// The symbol type number to denote an empty symbol.
-    enum { empty_symbol = -2 };
-
-    /// Internal symbol number for tokens (subsumed by symbol_number_type).
-    typedef signed char token_number_type;
+    /// The number of tokens.
+    static const symbol_kind_type YYNTOKENS = symbol_kind::YYNTOKENS;
 
     /// A complete symbol.
     ///
-    /// Expects its Base type to provide access to the symbol type
-    /// via type_get ().
+    /// Expects its Base type to provide access to the symbol kind
+    /// via kind ().
     ///
     /// Provide access to semantic value.
     template <typename Base>
@@ -483,19 +555,82 @@ namespace yy {
       typedef Base super_type;
 
       /// Default constructor.
-      basic_symbol ()
+      basic_symbol () YY_NOEXCEPT
         : value ()
       {}
 
 #if 201103L <= YY_CPLUSPLUS
       /// Move constructor.
-      basic_symbol (basic_symbol&& that);
+      basic_symbol (basic_symbol&& that)
+        : Base (std::move (that))
+        , value ()
+      {
+        switch (this->kind ())
+    {
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
+        value.move< ast_ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_branch: // branch
+        value.move< branch_ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_constructor: // constructor
+        value.move< constructor_ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
+        value.move< definition_ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_INT: // INT
+        value.move< int > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_pattern: // pattern
+        value.move< pattern_ptr > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
+        value.move< std::string > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_branches: // branches
+        value.move< std::vector<branch_ptr> > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_constructors: // constructors
+        value.move< std::vector<constructor_ptr> > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
+        value.move< std::vector<definition_ptr> > (std::move (that.value));
+        break;
+
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
+        value.move< std::vector<std::string> > (std::move (that.value));
+        break;
+
+      default:
+        break;
+    }
+
+      }
 #endif
 
       /// Copy constructor.
       basic_symbol (const basic_symbol& that);
 
-      /// Constructor for valueless symbols, and symbols from each type.
+      /// Constructors for typed symbols.
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t)
         : Base (t)
@@ -505,6 +640,7 @@ namespace yy {
         : Base (t)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, ast_ptr&& v)
         : Base (t)
@@ -516,6 +652,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, branch_ptr&& v)
         : Base (t)
@@ -527,6 +664,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, constructor_ptr&& v)
         : Base (t)
@@ -538,6 +676,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, definition_ptr&& v)
         : Base (t)
@@ -549,6 +688,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, int&& v)
         : Base (t)
@@ -560,6 +700,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, pattern_ptr&& v)
         : Base (t)
@@ -571,6 +712,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::string&& v)
         : Base (t)
@@ -582,6 +724,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::vector<branch_ptr>&& v)
         : Base (t)
@@ -593,6 +736,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::vector<constructor_ptr>&& v)
         : Base (t)
@@ -604,6 +748,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::vector<definition_ptr>&& v)
         : Base (t)
@@ -615,6 +760,7 @@ namespace yy {
         , value (v)
       {}
 #endif
+
 #if 201103L <= YY_CPLUSPLUS
       basic_symbol (typename Base::kind_type t, std::vector<std::string>&& v)
         : Base (t)
@@ -633,72 +779,74 @@ namespace yy {
         clear ();
       }
 
+
+
       /// Destroy contents, and record that is empty.
-      void clear ()
+      void clear () YY_NOEXCEPT
       {
         // User destructor.
-        symbol_number_type yytype = this->type_get ();
+        symbol_kind_type yykind = this->kind ();
         basic_symbol<Base>& yysym = *this;
         (void) yysym;
-        switch (yytype)
+        switch (yykind)
         {
        default:
           break;
         }
 
-        // Type destructor.
-switch (yytype)
+        // Value type destructor.
+switch (yykind)
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         value.template destroy< ast_ptr > ();
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         value.template destroy< branch_ptr > ();
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         value.template destroy< constructor_ptr > ();
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         value.template destroy< definition_ptr > ();
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         value.template destroy< int > ();
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         value.template destroy< pattern_ptr > ();
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         value.template destroy< std::string > ();
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         value.template destroy< std::vector<branch_ptr> > ();
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         value.template destroy< std::vector<constructor_ptr> > ();
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         value.template destroy< std::vector<definition_ptr> > ();
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         value.template destroy< std::vector<std::string> > ();
         break;
 
@@ -709,6 +857,18 @@ switch (yytype)
         Base::clear ();
       }
 
+#if YYDEBUG || 0
+      /// The user-facing name of this symbol.
+      const char *name () const YY_NOEXCEPT
+      {
+        return parser::symbol_name (this->kind ());
+      }
+#endif // #if YYDEBUG || 0
+
+
+      /// Backward compatibility (Bison 3.6).
+      symbol_kind_type type_get () const YY_NOEXCEPT;
+
       /// Whether empty.
       bool empty () const YY_NOEXCEPT;
 
@@ -716,7 +876,7 @@ switch (yytype)
       void move (basic_symbol& s);
 
       /// The semantic value.
-      semantic_type value;
+      value_type value;
 
     private:
 #if YY_CPLUSPLUS < 201103L
@@ -726,95 +886,94 @@ switch (yytype)
     };
 
     /// Type access provider for token (enum) based symbols.
-    struct by_type
+    struct by_kind
     {
+      /// The symbol kind as needed by the constructor.
+      typedef token_kind_type kind_type;
+
       /// Default constructor.
-      by_type ();
+      by_kind () YY_NOEXCEPT;
 
 #if 201103L <= YY_CPLUSPLUS
       /// Move constructor.
-      by_type (by_type&& that);
+      by_kind (by_kind&& that) YY_NOEXCEPT;
 #endif
 
       /// Copy constructor.
-      by_type (const by_type& that);
-
-      /// The symbol type as needed by the constructor.
-      typedef token_type kind_type;
+      by_kind (const by_kind& that) YY_NOEXCEPT;
 
       /// Constructor from (external) token numbers.
-      by_type (kind_type t);
+      by_kind (kind_type t) YY_NOEXCEPT;
+
+
 
       /// Record that this symbol is empty.
-      void clear ();
+      void clear () YY_NOEXCEPT;
 
-      /// Steal the symbol type from \a that.
-      void move (by_type& that);
+      /// Steal the symbol kind from \a that.
+      void move (by_kind& that);
 
       /// The (internal) type number (corresponding to \a type).
       /// \a empty when empty.
-      symbol_number_type type_get () const YY_NOEXCEPT;
+      symbol_kind_type kind () const YY_NOEXCEPT;
 
-      /// The symbol type.
-      /// \a empty_symbol when empty.
-      /// An int, not token_number_type, to be able to store empty_symbol.
-      int type;
+      /// Backward compatibility (Bison 3.6).
+      symbol_kind_type type_get () const YY_NOEXCEPT;
+
+      /// The symbol kind.
+      /// \a S_YYEMPTY when empty.
+      symbol_kind_type kind_;
     };
 
+    /// Backward compatibility for a private implementation detail (Bison 3.6).
+    typedef by_kind by_type;
+
     /// "External" symbols: returned by the scanner.
-    struct symbol_type : basic_symbol<by_type>
+    struct symbol_type : basic_symbol<by_kind>
     {
       /// Superclass.
-      typedef basic_symbol<by_type> super_type;
+      typedef basic_symbol<by_kind> super_type;
 
       /// Empty symbol.
-      symbol_type () {}
+      symbol_type () YY_NOEXCEPT {}
 
       /// Constructor for valueless symbols, and symbols from each type.
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok)
-        : super_type(token_type (tok))
-      {
-        YY_ASSERT (tok == 0 || tok == token::PLUS || tok == token::TIMES || tok == token::MINUS || tok == token::DIVIDE || tok == token::DEFN || tok == token::DATA || tok == token::CASE || tok == token::OF || tok == token::OCURLY || tok == token::CCURLY || tok == token::OPAREN || tok == token::CPAREN || tok == token::COMMA || tok == token::ARROW || tok == token::EQUAL);
-      }
+        : super_type (token_kind_type (tok))
 #else
       symbol_type (int tok)
-        : super_type(token_type (tok))
-      {
-        YY_ASSERT (tok == 0 || tok == token::PLUS || tok == token::TIMES || tok == token::MINUS || tok == token::DIVIDE || tok == token::DEFN || tok == token::DATA || tok == token::CASE || tok == token::OF || tok == token::OCURLY || tok == token::CCURLY || tok == token::OPAREN || tok == token::CPAREN || tok == token::COMMA || tok == token::ARROW || tok == token::EQUAL);
-      }
+        : super_type (token_kind_type (tok))
 #endif
+      {}
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, int v)
-        : super_type(token_type (tok), std::move (v))
-      {
-        YY_ASSERT (tok == token::INT);
-      }
+        : super_type (token_kind_type (tok), std::move (v))
 #else
       symbol_type (int tok, const int& v)
-        : super_type(token_type (tok), v)
-      {
-        YY_ASSERT (tok == token::INT);
-      }
+        : super_type (token_kind_type (tok), v)
 #endif
+      {}
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, std::string v)
-        : super_type(token_type (tok), std::move (v))
-      {
-        YY_ASSERT (tok == token::LID || tok == token::UID);
-      }
+        : super_type (token_kind_type (tok), std::move (v))
 #else
       symbol_type (int tok, const std::string& v)
-        : super_type(token_type (tok), v)
-      {
-        YY_ASSERT (tok == token::LID || tok == token::UID);
-      }
+        : super_type (token_kind_type (tok), v)
 #endif
+      {}
     };
 
     /// Build a parser object.
     parser ();
     virtual ~parser ();
+
+#if 201103L <= YY_CPLUSPLUS
+    /// Non copyable.
+    parser (const parser&) = delete;
+    /// Non copyable.
+    parser& operator= (const parser&) = delete;
+#endif
 
     /// Parse.  An alias for parse ().
     /// \returns  0 iff parsing succeeded.
@@ -845,7 +1004,59 @@ switch (yytype)
     /// Report a syntax error.
     void error (const syntax_error& err);
 
-    // Implementation of make_symbol for each symbol type.
+#if YYDEBUG || 0
+    /// The user-facing name of the symbol whose (internal) number is
+    /// YYSYMBOL.  No bounds checking.
+    static const char *symbol_name (symbol_kind_type yysymbol);
+#endif // #if YYDEBUG || 0
+
+
+    // Implementation of make_symbol for each token kind.
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_YYEOF ()
+      {
+        return symbol_type (token::YYEOF);
+      }
+#else
+      static
+      symbol_type
+      make_YYEOF ()
+      {
+        return symbol_type (token::YYEOF);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_YYerror ()
+      {
+        return symbol_type (token::YYerror);
+      }
+#else
+      static
+      symbol_type
+      make_YYerror ()
+      {
+        return symbol_type (token::YYerror);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_YYUNDEF ()
+      {
+        return symbol_type (token::YYUNDEF);
+      }
+#else
+      static
+      symbol_type
+      make_YYUNDEF ()
+      {
+        return symbol_type (token::YYUNDEF);
+      }
+#endif
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
@@ -1119,18 +1330,16 @@ switch (yytype)
 
 
   private:
-    /// This class is not copyable.
+#if YY_CPLUSPLUS < 201103L
+    /// Non copyable.
     parser (const parser&);
+    /// Non copyable.
     parser& operator= (const parser&);
+#endif
+
 
     /// Stored state numbers (used for stacks).
     typedef signed char state_type;
-
-    /// Generate an error message.
-    /// \param yystate   the state where the error occurred.
-    /// \param yyla      the lookahead token.
-    virtual std::string yysyntax_error_ (state_type yystate,
-                                         const symbol_type& yyla) const;
 
     /// Compute post-reduction state.
     /// \param yystate   the current state
@@ -1139,19 +1348,25 @@ switch (yytype)
 
     /// Whether the given \c yypact_ value indicates a defaulted state.
     /// \param yyvalue   the value to check
-    static bool yy_pact_value_is_default_ (int yyvalue);
+    static bool yy_pact_value_is_default_ (int yyvalue) YY_NOEXCEPT;
 
     /// Whether the given \c yytable_ value indicates a syntax error.
     /// \param yyvalue   the value to check
-    static bool yy_table_value_is_error_ (int yyvalue);
+    static bool yy_table_value_is_error_ (int yyvalue) YY_NOEXCEPT;
 
     static const signed char yypact_ninf_;
     static const signed char yytable_ninf_;
 
-    /// Convert a scanner token number \a t to a symbol number.
-    /// In theory \a t should be a token_type, but character literals
-    /// are valid, yet not members of the token_type enum.
-    static token_number_type yytranslate_ (int t);
+    /// Convert a scanner token kind \a t to a symbol kind.
+    /// In theory \a t should be a token_kind_type, but character literals
+    /// are valid, yet not members of the token_kind_type enum.
+    static symbol_kind_type yytranslate_ (int t) YY_NOEXCEPT;
+
+#if YYDEBUG || 0
+    /// For a symbol, its name in clear.
+    static const char* const yytname_[];
+#endif // #if YYDEBUG || 0
+
 
     // Tables.
     // YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
@@ -1176,34 +1391,31 @@ switch (yytype)
 
     static const signed char yycheck_[];
 
-    // YYSTOS[STATE-NUM] -- The (internal number of the) accessing
-    // symbol of state STATE-NUM.
+    // YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
+    // state STATE-NUM.
     static const signed char yystos_[];
 
-    // YYR1[YYN] -- Symbol number of symbol that rule YYN derives.
+    // YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.
     static const signed char yyr1_[];
 
-    // YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.
+    // YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.
     static const signed char yyr2_[];
 
 
 #if YYDEBUG
-    /// For a symbol, its name in clear.
-    static const char* const yytname_[];
-
     // YYRLINE[YYN] -- Source line where rule number YYN was defined.
     static const unsigned char yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
-    virtual void yy_reduce_print_ (int r);
+    virtual void yy_reduce_print_ (int r) const;
     /// Print the state stack on the debug stream.
-    virtual void yystack_print_ ();
+    virtual void yy_stack_print_ () const;
 
     /// Debugging level.
     int yydebug_;
     /// Debug stream.
     std::ostream* yycdebug_;
 
-    /// \brief Display a symbol type, value and location.
+    /// \brief Display a symbol kind, value and location.
     /// \param yyo    The output stream.
     /// \param yysym  The symbol.
     template <typename Base>
@@ -1224,7 +1436,7 @@ switch (yytype)
       /// Default constructor.
       by_state () YY_NOEXCEPT;
 
-      /// The symbol type as needed by the constructor.
+      /// The symbol kind as needed by the constructor.
       typedef state_type kind_type;
 
       /// Constructor.
@@ -1236,12 +1448,12 @@ switch (yytype)
       /// Record that this symbol is empty.
       void clear () YY_NOEXCEPT;
 
-      /// Steal the symbol type from \a that.
+      /// Steal the symbol kind from \a that.
       void move (by_state& that);
 
-      /// The (internal) type number (corresponding to \a state).
-      /// \a empty_symbol when empty.
-      symbol_number_type type_get () const YY_NOEXCEPT;
+      /// The symbol kind (corresponding to \a state).
+      /// \a symbol_kind::S_YYEMPTY when empty.
+      symbol_kind_type kind () const YY_NOEXCEPT;
 
       /// The state number used to denote an empty symbol.
       /// We use the initial state, as it does not have a value.
@@ -1280,14 +1492,21 @@ switch (yytype)
     {
     public:
       // Hide our reversed order.
-      typedef typename S::reverse_iterator iterator;
-      typedef typename S::const_reverse_iterator const_iterator;
+      typedef typename S::iterator iterator;
+      typedef typename S::const_iterator const_iterator;
       typedef typename S::size_type size_type;
       typedef typename std::ptrdiff_t index_type;
 
-      stack (size_type n = 200)
+      stack (size_type n = 200) YY_NOEXCEPT
         : seq_ (n)
       {}
+
+#if 201103L <= YY_CPLUSPLUS
+      /// Non copyable.
+      stack (const stack&) = delete;
+      /// Non copyable.
+      stack& operator= (const stack&) = delete;
+#endif
 
       /// Random access.
       ///
@@ -1339,31 +1558,25 @@ switch (yytype)
         return index_type (seq_.size ());
       }
 
-      std::ptrdiff_t
-      ssize () const YY_NOEXCEPT
-      {
-        return std::ptrdiff_t (size ());
-      }
-
       /// Iterator on top of the stack (going downwards).
       const_iterator
       begin () const YY_NOEXCEPT
       {
-        return seq_.rbegin ();
+        return seq_.begin ();
       }
 
       /// Bottom of the stack.
       const_iterator
       end () const YY_NOEXCEPT
       {
-        return seq_.rend ();
+        return seq_.end ();
       }
 
       /// Present a slice of the top of a stack.
       class slice
       {
       public:
-        slice (const stack& stack, index_type range)
+        slice (const stack& stack, index_type range) YY_NOEXCEPT
           : stack_ (stack)
           , range_ (range)
         {}
@@ -1380,8 +1593,12 @@ switch (yytype)
       };
 
     private:
+#if YY_CPLUSPLUS < 201103L
+      /// Non copyable.
       stack (const stack&);
+      /// Non copyable.
       stack& operator= (const stack&);
+#endif
       /// The wrapped container.
       S seq_;
     };
@@ -1409,33 +1626,28 @@ switch (yytype)
     void yypush_ (const char* m, state_type s, YY_MOVE_REF (symbol_type) sym);
 
     /// Pop \a n symbols from the stack.
-    void yypop_ (int n = 1);
-
-    /// Some specific tokens.
-    static const token_number_type yy_error_token_ = 1;
-    static const token_number_type yy_undef_token_ = 2;
+    void yypop_ (int n = 1) YY_NOEXCEPT;
 
     /// Constants.
     enum
     {
-      yyeof_ = 0,
       yylast_ = 62,     ///< Last index in yytable_.
       yynnts_ = 18,  ///< Number of nonterminal symbols.
-      yyfinal_ = 10, ///< Termination state number.
-      yyntokens_ = 21  ///< Number of tokens.
+      yyfinal_ = 10 ///< Termination state number.
     };
+
 
 
   };
 
   inline
-  parser::token_number_type
-  parser::yytranslate_ (int t)
+  parser::symbol_kind_type
+  parser::yytranslate_ (int t) YY_NOEXCEPT
   {
     // YYTRANSLATE[TOKEN-NUM] -- Symbol number corresponding to
     // TOKEN-NUM as returned by yylex.
     static
-    const token_number_type
+    const signed char
     translate_table[] =
     {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -1467,142 +1679,75 @@ switch (yytype)
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20
     };
-    const int user_token_number_max_ = 275;
+    // Last valid token kind.
+    const int code_max = 275;
 
     if (t <= 0)
-      return yyeof_;
-    else if (t <= user_token_number_max_)
-      return translate_table[t];
+      return symbol_kind::S_YYEOF;
+    else if (t <= code_max)
+      return static_cast <symbol_kind_type> (translate_table[t]);
     else
-      return yy_undef_token_;
+      return symbol_kind::S_YYUNDEF;
   }
 
   // basic_symbol.
-#if 201103L <= YY_CPLUSPLUS
-  template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (basic_symbol&& that)
-    : Base (std::move (that))
-    , value ()
-  {
-    switch (this->type_get ())
-    {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
-        value.move< ast_ptr > (std::move (that.value));
-        break;
-
-      case 34: // branch
-        value.move< branch_ptr > (std::move (that.value));
-        break;
-
-      case 38: // constructor
-        value.move< constructor_ptr > (std::move (that.value));
-        break;
-
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
-        value.move< definition_ptr > (std::move (that.value));
-        break;
-
-      case 7: // INT
-        value.move< int > (std::move (that.value));
-        break;
-
-      case 35: // pattern
-        value.move< pattern_ptr > (std::move (that.value));
-        break;
-
-      case 19: // LID
-      case 20: // UID
-        value.move< std::string > (std::move (that.value));
-        break;
-
-      case 33: // branches
-        value.move< std::vector<branch_ptr> > (std::move (that.value));
-        break;
-
-      case 37: // constructors
-        value.move< std::vector<constructor_ptr> > (std::move (that.value));
-        break;
-
-      case 22: // program
-      case 23: // definitions
-        value.move< std::vector<definition_ptr> > (std::move (that.value));
-        break;
-
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
-        value.move< std::vector<std::string> > (std::move (that.value));
-        break;
-
-      default:
-        break;
-    }
-
-  }
-#endif
-
   template <typename Base>
   parser::basic_symbol<Base>::basic_symbol (const basic_symbol& that)
     : Base (that)
     , value ()
   {
-    switch (this->type_get ())
+    switch (this->kind ())
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         value.copy< ast_ptr > (YY_MOVE (that.value));
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         value.copy< branch_ptr > (YY_MOVE (that.value));
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         value.copy< constructor_ptr > (YY_MOVE (that.value));
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         value.copy< definition_ptr > (YY_MOVE (that.value));
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         value.copy< int > (YY_MOVE (that.value));
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         value.copy< pattern_ptr > (YY_MOVE (that.value));
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         value.copy< std::string > (YY_MOVE (that.value));
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         value.copy< std::vector<branch_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         value.copy< std::vector<constructor_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         value.copy< std::vector<definition_ptr> > (YY_MOVE (that.value));
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         value.copy< std::vector<std::string> > (YY_MOVE (that.value));
         break;
 
@@ -1614,11 +1759,20 @@ switch (yytype)
 
 
 
+
+  template <typename Base>
+  parser::symbol_kind_type
+  parser::basic_symbol<Base>::type_get () const YY_NOEXCEPT
+  {
+    return this->kind ();
+  }
+
+
   template <typename Base>
   bool
   parser::basic_symbol<Base>::empty () const YY_NOEXCEPT
   {
-    return Base::type_get () == empty_symbol;
+    return this->kind () == symbol_kind::S_YYEMPTY;
   }
 
   template <typename Base>
@@ -1626,58 +1780,58 @@ switch (yytype)
   parser::basic_symbol<Base>::move (basic_symbol& s)
   {
     super_type::move (s);
-    switch (this->type_get ())
+    switch (this->kind ())
     {
-      case 28: // aAdd
-      case 29: // aMul
-      case 30: // app
-      case 31: // appBase
-      case 32: // case
+      case symbol_kind::S_aAdd: // aAdd
+      case symbol_kind::S_aMul: // aMul
+      case symbol_kind::S_app: // app
+      case symbol_kind::S_appBase: // appBase
+      case symbol_kind::S_case: // case
         value.move< ast_ptr > (YY_MOVE (s.value));
         break;
 
-      case 34: // branch
+      case symbol_kind::S_branch: // branch
         value.move< branch_ptr > (YY_MOVE (s.value));
         break;
 
-      case 38: // constructor
+      case symbol_kind::S_constructor: // constructor
         value.move< constructor_ptr > (YY_MOVE (s.value));
         break;
 
-      case 24: // definition
-      case 25: // defn
-      case 36: // data
+      case symbol_kind::S_definition: // definition
+      case symbol_kind::S_defn: // defn
+      case symbol_kind::S_data: // data
         value.move< definition_ptr > (YY_MOVE (s.value));
         break;
 
-      case 7: // INT
+      case symbol_kind::S_INT: // INT
         value.move< int > (YY_MOVE (s.value));
         break;
 
-      case 35: // pattern
+      case symbol_kind::S_pattern: // pattern
         value.move< pattern_ptr > (YY_MOVE (s.value));
         break;
 
-      case 19: // LID
-      case 20: // UID
+      case symbol_kind::S_LID: // LID
+      case symbol_kind::S_UID: // UID
         value.move< std::string > (YY_MOVE (s.value));
         break;
 
-      case 33: // branches
+      case symbol_kind::S_branches: // branches
         value.move< std::vector<branch_ptr> > (YY_MOVE (s.value));
         break;
 
-      case 37: // constructors
+      case symbol_kind::S_constructors: // constructors
         value.move< std::vector<constructor_ptr> > (YY_MOVE (s.value));
         break;
 
-      case 22: // program
-      case 23: // definitions
+      case symbol_kind::S_program: // program
+      case symbol_kind::S_definitions: // definitions
         value.move< std::vector<definition_ptr> > (YY_MOVE (s.value));
         break;
 
-      case 26: // lowercaseParams
-      case 27: // uppercaseParams
+      case symbol_kind::S_lowercaseParams: // lowercaseParams
+      case symbol_kind::S_uppercaseParams: // uppercaseParams
         value.move< std::vector<std::string> > (YY_MOVE (s.value));
         break;
 
@@ -1687,56 +1841,66 @@ switch (yytype)
 
   }
 
-  // by_type.
+  // by_kind.
   inline
-  parser::by_type::by_type ()
-    : type (empty_symbol)
+  parser::by_kind::by_kind () YY_NOEXCEPT
+    : kind_ (symbol_kind::S_YYEMPTY)
   {}
 
 #if 201103L <= YY_CPLUSPLUS
   inline
-  parser::by_type::by_type (by_type&& that)
-    : type (that.type)
+  parser::by_kind::by_kind (by_kind&& that) YY_NOEXCEPT
+    : kind_ (that.kind_)
   {
     that.clear ();
   }
 #endif
 
   inline
-  parser::by_type::by_type (const by_type& that)
-    : type (that.type)
+  parser::by_kind::by_kind (const by_kind& that) YY_NOEXCEPT
+    : kind_ (that.kind_)
   {}
 
   inline
-  parser::by_type::by_type (token_type t)
-    : type (yytranslate_ (t))
+  parser::by_kind::by_kind (token_kind_type t) YY_NOEXCEPT
+    : kind_ (yytranslate_ (t))
   {}
+
+
 
   inline
   void
-  parser::by_type::clear ()
+  parser::by_kind::clear () YY_NOEXCEPT
   {
-    type = empty_symbol;
+    kind_ = symbol_kind::S_YYEMPTY;
   }
 
   inline
   void
-  parser::by_type::move (by_type& that)
+  parser::by_kind::move (by_kind& that)
   {
-    type = that.type;
+    kind_ = that.kind_;
     that.clear ();
   }
 
   inline
-  int
-  parser::by_type::type_get () const YY_NOEXCEPT
+  parser::symbol_kind_type
+  parser::by_kind::kind () const YY_NOEXCEPT
   {
-    return type;
+    return kind_;
   }
 
-} // yy
-#line 1739 "parser.hpp"
 
+  inline
+  parser::symbol_kind_type
+  parser::by_kind::type_get () const YY_NOEXCEPT
+  {
+    return this->kind ();
+  }
+
+
+} // yy
+#line 1904 "parser.hpp"
 
 
 

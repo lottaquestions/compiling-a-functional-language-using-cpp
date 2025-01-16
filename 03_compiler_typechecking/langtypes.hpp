@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <map>
+#include <string>
 
 struct type{
   virtual ~type() = default;

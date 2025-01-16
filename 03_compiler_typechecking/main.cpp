@@ -1,6 +1,6 @@
 #include "ast.hpp"
 #include "parser.hpp"
-#include "type.hpp"
+#include "langtypes.hpp"
 
 void yy::parser::error(const std::string& msg){
   std::cout << "An error occured: " << msg << std::endl;

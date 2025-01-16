@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include "type.hpp"
+#include "langtypes.hpp"
 #include "env.hpp"
 
 struct ast{
