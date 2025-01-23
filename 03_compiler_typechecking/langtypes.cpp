@@ -73,7 +73,7 @@ void type_mgr::bind(const std::string& s, type_ptr t){
   type_var* other = dynamic_cast<type_var*>(t.get());
 
   if (other && other->name == s){
-    return;
+    return; // Avoid self-referential binding
   }
 
   types[s]= t;
